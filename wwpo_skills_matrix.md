@@ -10,11 +10,11 @@ This document maps the architectural requirements defined in the WWPO PRD/Techni
 ```mermaid
 mindmap
   root((WWPO Development))
-    C# Client Agent
+    Go Client Agent (Windows)
       Windows Registry Manipulation
-      Firewall COM Interfaces
+      Firewall (netsh) Orchestration
       Secedit Security Policies
-      NT AUTHORITY SYSTEM Services
+      Windows Service Integration
     Go Master Backend
       Concurrency & goroutines
       WebSocket Connections
@@ -34,16 +34,16 @@ mindmap
 
 ## 2. Component-by-Component Competencies
 
-### 2.1 C# Client Agent Developer (.NET Core / C# Native)
-*The C# Agent is a native Windows Service running with elevated local privileges (`NT AUTHORITY\SYSTEM`). Development requires deep familiarity with low-level Windows APIs and system administration tools.*
+### 2.1 Go Client Agent Developer (Go / Windows APIs)
+*The Go Client Agent runs as a native Windows Service (with POSIX fallbacks for local dev) using elevated local privileges (`SYSTEM` / `Administrators`). Development requires expertise in Go cross-compilation, Windows platform-specific APIs, and system administration utilities.*
 
 | Sub-Skill Area | Specific Competencies | Relevant WWPO Feature |
 | :--- | :--- | :--- |
-| **Windows Registry Administration** | Read, write, delete, and monitor registry keys. Understanding key-types (REG_DWORD, REG_SZ, REG_BINARY, REG_QWORD) and transactional registry safety. | USB Stor blocking, Software Restriction Policies (SRP), Windows Update settings. |
-| **Windows Service Development** | Building long-running, resilient Windows Services using .NET Worker Services. Implementing service recovery actions (automatic restarts) and handling system power-state changes. | Core agent execution model. |
-| **Windows Firewall COM Interop** | Using COM interfaces in .NET. Instantiating `INetFwPolicy2` and manipulating the `INetFwRules` collection to dynamically inject, update, or remove rules. | Firewall Orchestration. |
-| **Secedit.exe Configuration** | Writing C# wrappers to securely call `secedit.exe`. Programmatic editing of `.inf` template files (INI format parsing) and database application (`.sdb`). | Local Account hardening and lockout thresholds. |
-| **WebSocket Client Library** | Managing client-side persistent connections (`ClientWebSocket`). Implementing heartbeat (Ping/Pong) frames and exponential backoff retry algorithms. | Connection Upkeep and Resilience. |
+| **Windows Registry Administration** | Invoking registry commands and parsing outcomes. Handling security baselines for USB mass storage blocking, Safer path restriction configurations (SRP), and Windows Updates. | USB Stor blocking, Software Restriction Policies (SRP), Windows Update settings. |
+| **Windows Service Development** | Building long-running, native Windows Services using Go's `golang.org/x/sys/windows/svc` control interface. Handling service signals (Stop, Shutdown) and executing clean exits. | Core agent execution model. |
+| **Windows Firewall Orchestration** | Dynamically manipulating active firewall configurations using shell commands (`netsh advfirewall`) or powershell cmdlet invocations. | Firewall Orchestration. |
+| **Secedit.exe Configuration** | Implementing program wrappers to run `secedit.exe` securely. Exporting, dynamically modifying `.inf` configuration templates (INI structure), and applying baseline policies. | Local Account hardening and lockout thresholds. |
+| **WebSocket Client Engine** | Managing client-side persistent WebSocket connections. Implementing handshake signature checks, heartbeat ping/pong keepalives, and connection resilience. | Connection Upkeep and Resilience. |
 
 ---
 
@@ -85,6 +85,6 @@ mindmap
 To validate the security engine, QA engineers need specific testing competencies:
 
 1. **Virtualization & Sandbox Deployment:** Setting up local Windows Workgroup VMs (Windows 10/11 Professional or Enterprise) to test policy enforcement without disrupting corporate environments.
-2. **Fault Injection Testing:** Simulating network failures, proxy interruptions, DNS poisoning, and firewall blocks to test the C# Agent's exponential backoff and offline enforcement behaviors.
-3. **OS-State Auditing:** Utilizing Windows tools (`Regedit.exe`, `Secpol.msc`, `Eventvwr.msc`, `wf.msc`) to manually verify changes applied by the agent service and confirm the behavior of the self-healing engine.
-4. **Security Penetration Testing:** Simulating a compromised local administrator account attempting to disable the agent service or bypass registry blocks to ensure the self-healing and service protection locks function.
+2. **Fault Injection Testing:** Simulating network failures, proxy interruptions, DNS poisoning, and firewall blocks to test the Go Client Agent's backoff and local offline policy cache enforcement behaviors.
+3. **OS-State Auditing:** Utilizing Windows tools (`Regedit.exe`, `Secpol.msc`, `Eventvwr.msc`, `wf.msc`) to manually verify changes applied by the Go agent service and confirm the behavior of the self-healing engine.
+4. **Security Penetration Testing:** Simulating a compromised local user attempting to bypass registry blocks or run restricted applications to ensure the self-healing loops and service protection locks function.
