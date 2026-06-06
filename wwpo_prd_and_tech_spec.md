@@ -26,22 +26,22 @@ WWPO uses a centralized **Hub-and-Spoke (Master-Agent)** topology. The system is
 
 ```mermaid
 graph TD
-    subgraph "Master Control Center (Hub)"
+    subgraph Hub ["Master Control Center (Hub)"]
         UI["React Admin Dashboard (Browser)"] <-->|HTTPS / REST API| GoServer["Go Master Backend"]
         GoServer <--> DB[("SQLite Embedded Database")]
         GoServer <--> MemoryMap["Concurrent Conn Map (In-Memory)"]
     end
     
-    subgraph "Network Boundaries"
+    subgraph LAN ["Network Boundaries"]
         Router{"Local LAN Router"}
     end
 
-    subgraph "Logical Network Isolation (Workgroups)"
-        subgraph "Workgroup: FINANCE_DEPT"
+    subgraph Workgroups ["Logical Network Isolation (Workgroups)"]
+        subgraph Finance ["Workgroup: FINANCE_DEPT"]
             Agent1["Go Agent 01 (FINANCE_DEPT)"]
             Agent2["Go Agent 02 (FINANCE_DEPT)"]
         end
-        subgraph "Workgroup: SALES_DEPT"
+        subgraph Sales ["Workgroup: SALES_DEPT"]
             Agent3["Go Agent 03 (SALES_DEPT)"]
             Agent4["Go Agent 04 (SALES_DEPT)"]
         end
@@ -54,8 +54,8 @@ graph TD
     Router <-->|Persistent WSS / TCP| Agent3
     Router <-->|Persistent WSS / TCP| Agent4
 
-    style Master Control Center (Hub) fill:#1e1e2e,stroke:#313244,stroke-width:2px;
-    style Logical Network Isolation (Workgroups) fill:#181825,stroke:#313244,stroke-width:2px;
+    style Hub fill:#1e1e2e,stroke:#313244,stroke-width:2px;
+    style Workgroups fill:#181825,stroke:#313244,stroke-width:2px;
 ```
 
 ### 2.1 Master Node (Hub)
