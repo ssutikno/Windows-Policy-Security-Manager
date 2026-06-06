@@ -1,0 +1,22 @@
+# Database files
+*.db
+*.db-journal
+
+# Compiled binaries in dev directories
+master-backend/master-server
+master-backend/master-server.exe
+client-agent-go/agent.exe
+client-agent-go/agent
+client-agent-go/policy_cache.json
+
+# Dependency directories
+node_modules/
+master-frontend/dist/
+
+# Local data cache directories
+WWPO_Data/
+client-agent-go/WWPO_Data/
+
+# OS generated files
+.DS_Store
+Thumbs.db

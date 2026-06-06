@@ -1,0 +1,15 @@
+[Unit]
+Description=WWPO Master Security Control Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/wwpo-master
+ExecStart=/opt/wwpo-master/master-server
+Restart=always
+RestartSec=10
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
